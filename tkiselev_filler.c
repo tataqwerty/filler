@@ -46,8 +46,6 @@ void	ft_str(char *str)
 	}
 }
 
-
-
 char		get_player(void)
 {
 	char *line;
@@ -80,16 +78,18 @@ void	get_width_n_height(short *width, short *height)
 
 short		**create_array(short width, short height)
 {
-	char *line;
-	short **array;
+	short	**array;
+	short	x;
 
 	if (!(array = (short**)malloc(sizeof(short *) * height)))
 		return (NULL);
 	while (--height >= 0)
 	{
+		x = -1;
 		if (!(array[height] = (short*)malloc(sizeof(short) * width)))
 			return (NULL);
-		ft_memset(array[height], 0, width);
+		while (++x < width)
+			array[height][x] = 0;
 	}
 	return (array);
 }
@@ -143,34 +143,93 @@ void	get_players_coords(t_filler *s)
 	}
 }
 
-void	put_players_on_board(t_filler *s)
+void	put_players_on_board(t_filler *s, short **array)
 {
-	while (s->me)
+	t_coords	*me;
+	t_coords	*enemy;
+
+	me = s->me;
+	enemy = s->enemy;
+	while (me)
 	{
-		s->array[s->me->y][s->me->x] = -1;
-		s->me = s->me->next;
+		array[me->y][me->x] = -1;
+		me = me->next;
 	}
-	while (s->enemy)
+	while (enemy)
 	{
-		s->array[s->enemy->y][s->enemy->x] = -2;
-		s->enemy = s->enemy->next;
+		array[enemy->y][enemy->x] = -2;
+		enemy = enemy->next;
 	}
 }
 
-void	add_coordinate_on_array(t_filler *s, short x, short y)
+void	bzero_board(t_filler *s)
 {
-	short	steps;
-	short	tmp;
+	short y;
+	short x;
 
-	steps = 32767;
-	while (s->enemy)
+	y = -1;
+	while (++y < s->height)
 	{
-		tmp = ABS(s->enemy->x - x) + ABS(s->enemy->y - y);
-		if (tmp < steps)
-			steps = tmp;
-		s->enemy = s->enemy->next;
+		x = -1;
+		while (++x < s->width)
+			s->array[y][x] = 0;
 	}
-	s->array[y][x] = steps;
+}
+
+void	array_del(short **array, short height)
+{
+	while (height >= 0)
+		free(array[height--]);
+	free(array);
+}
+
+
+
+
+short	ft_coord_helper(t_filler *s, short **array, short x, short y)
+{
+	short d;
+
+	d = 1;
+	while (++y < s->height)
+	{
+		x = -1;
+		while (++x < s->width)
+		{
+			if (array[y][x] == d)
+			{
+				if ((y > 0 && array[y - 1][x] == -2) || (y < (s->height - 1)
+				&& array[y + 1][x] == -2) || (x > 0 && array[y][x - 1] == -2)
+				|| (x < (s->width - 1) && array[y][x + 1] == -2))
+					return (d);
+				if (y > 0 && array[y - 1][x] == 0)
+					array[y - 1][x] = d + 1;
+				if (y < (s->height - 1) && array[y + 1][x] == 0)
+					array[y + 1][x] = d + 1;
+				if (x > 0 && array[y][x - 1] == 0)
+					array[y][x - 1] = d + 1;
+				if (x < (s->width - 1) && array[y][x + 1] == 0)
+					array[y][x + 1] = d + 1;
+			}
+		}
+		if (y == (s->height - 1))
+		{
+			d++;
+			y = -1;
+		}
+	}
+	return (0);
+}
+
+void	add_coordinate_to_board(t_filler *s, short x, short y)
+{
+	short **tmp_array;
+
+	tmp_array = create_array(s->width, s->height);
+	put_players_on_board(s, tmp_array);
+	tmp_array[y][x] = 1;
+	s->array[y][x] = ft_coord_helper(s, tmp_array, x, -1);
+	//array_del(tmp_array, s->height);
 }
 
 void	fill_array(t_filler *s)
@@ -178,17 +237,18 @@ void	fill_array(t_filler *s)
 	short		x;
 	short		y;
 
-	put_players_on_board(s);
-	// y = -1;
-	// while (++y < s->height)
-	// {
-	// 	x = -1;
-	// 	while (++x < s->width)
-	// 	{
-	// 		if (s->array[y][x] == 0)
-	// 			add_coordinate_on_array(s, x, y);
-	// 	}
-	// }
+	bzero_board(s);
+	put_players_on_board(s, s->array);
+	y = -1;
+	while (++y < s->height)
+	{
+		x = -1;
+		while(++x < s->width)
+		{
+			if (s->array[y][x] == 0)
+				add_coordinate_to_board(s, x, y);
+		}
+	}
 }
 
 int		main(void)
@@ -208,8 +268,8 @@ int		main(void)
 		s->array = create_array(s->width, s->height);
 	}
 	get_players_coords(s);
-	//fill_array(s);
-	
+	fill_array(s);
+
 	int y = -1;
 	int x;
 	while (++y < s->height)
