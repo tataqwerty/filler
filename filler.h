@@ -14,8 +14,8 @@
 # define FILLER_H
 
 # include "libft.h"
-
-#include <stdio.h> // DELETE_ME
+# include <stdio.h>
+# include <errno.h>
 
 # define ABS(x) (x < 0 ? -x : x)
 
@@ -35,4 +35,18 @@ typedef struct
 	t_coords	*enemy;
 	t_coords	*me;
 }				t_filler;
+
+typedef struct
+{
+	short k;
+	short width;
+	short height;
+	short shape_width;
+	short shape_height;
+	short min_x;
+	short min_y;
+	short *x;
+	short *y;
+	short **arr;
+}				t_piece;
 #endif
