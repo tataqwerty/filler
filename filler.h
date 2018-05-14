@@ -19,6 +19,8 @@
 
 # define ABS(x) (x < 0 ? -x : x)
 
+int		piece_counter = 0;
+
 typedef struct			s_coords
 {
 	short				x;
@@ -34,6 +36,7 @@ typedef struct
 	short		height;
 	t_coords	*enemy;
 	t_coords	*me;
+	short		flag_for_arr;
 }				t_filler;
 
 typedef struct

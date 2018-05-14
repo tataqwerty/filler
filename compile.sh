@@ -1,3 +1,3 @@
 gcc tkiselev_filler.c libft.a \-o tkiselev.filler
 mv tkiselev.filler players/
-./filler_vm \-f maps/map00 \-p1 players/tkiselev.filler \-p2 players/champely.filler
+./filler_vm \-f maps/map02 \-p2 players/tkiselev.filler \-p1 players/carli.filler

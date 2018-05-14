@@ -46,6 +46,14 @@ void	ft_str(char *str)
 	}
 }
 
+void	ft_win(short x, short y)
+{
+	ft_putnbr(y);
+	write(1, " ", 1);
+	ft_putnbr(x);
+	write(1, "\n", 1);
+}
+
 char		get_player(void)
 {
 	char *line;
@@ -60,20 +68,17 @@ char		get_player(void)
 	return (p);
 }
 
-void	get_width_n_height(short *width, short *height)
+void	get_width_n_height(short *width, short *height, char *line)
 {
-	char	*line;
 	short	i;
 
 	i = 0;
-	get_next_line(0, &line);
 	while (line[i] < '0' || line[i] > '9')
 		i++;
 	*height = ft_atoi(line + i);
 	while (line[i] >= '0' && line[i] <= '9')
 		i++;
 	*width = ft_atoi(line + i);
-	free(line);
 }
 
 short		**create_array(short width, short height)
@@ -120,30 +125,15 @@ void	add_coords_if(t_coords **head, short x, short y)
 		*head = tmp;
 }
 
-void	skip_shit()
-{
-	static  char	flag = 0;
-	char 			*line;
-
-	if (flag != 0)
-	{
-		get_next_line(0, &line);
-		free(line);
-	}
-	get_next_line(0, &line);
-	free(line);
-	flag = 1;
-}
-
 void	get_players_coords(t_filler *s)
 {
-	static int counter = 0;
 	char	*line;
 	short	h;
 	short	w;
 
 	h = -1;
-	skip_shit();
+	get_next_line(0, &line);
+	free(line);
 	while (++h < s->height && get_next_line(0, &line) > 0)
 	{
 		w = 3;
@@ -222,6 +212,7 @@ void	fill_array(t_filler *s)
 	short x;
 	short d;
 
+	put_players_on_board(s, s->array);
 	add_ones(s);
 	d = 1;
 	y = -1;
@@ -352,99 +343,6 @@ void	init_piece_arr(t_piece *piece)
 		piece->arr[piece->y[k]][piece->x[k]] = -3;
 }
 
-short	value_of_piece(t_piece *piece)
-{
-	short my_counter;
-	short x;
-	short y;
-	short sum;
-
-	sum = 0;
-	y = -1;
-	my_counter = 0;
-	while (++y < piece->shape_height)
-	{
-		x = -1;
-		while (++x < piece->shape_width)
-		{
-			if (piece->arr[y][x] == -2)
-				return (-1);
-			else if (piece->arr[y][x] == -1)
-				my_counter++;
-			else
-				sum += piece->arr[y][x];
-		}
-	}
-	if (my_counter != 1)
-		return (-1);
-	return (sum);
-}
-
-short	put_piece_on_map(t_filler *s, t_piece *piece, short x, short y)
-{
-	short px;
-	short py;
-
-	py = -1;
-	while (++py < piece->shape_height)
-	{
-		px = -1;
-		while (++px < piece->shape_width)
-		{
-			if (piece->arr[py][px] == -3 &&
-			(py + y) < s->height && (x + px) < s->width)
-				piece->arr[py][px] = s->array[y + py][x + px];
-		}
-	}
-	return (value_of_piece(piece));	
-}
-
-void	piece_del(t_piece *piece)
-{
-	free(piece->x);
-	free(piece->y);
-	while (--(piece->shape_height) >= 0)
-		free(piece->arr[piece->shape_height]);
-	free(piece->arr);
-}
-
-short	algorithm(t_filler *s, t_piece *piece, short x, short y)
-{
-	short tmp;
-	short tmp2;
-	short opt_y;
-	short opt_x;
-
-	opt_y = -1;
-	opt_x = -1;
-	tmp = 30000;
-	if (!(piece->arr = create_array(piece->shape_width, piece->shape_height)))
-		return (-1);
-	while (++y < s->height)
-	{
-		x = -1;
-		while (++x < s->width)
-		{
-			init_piece_arr(piece);
-			tmp2 = put_piece_on_map(s, piece, x, y);
-			if (tmp2 < tmp && tmp2 > 0)
-			{
-				tmp = tmp2;
-				opt_x = x;
-				opt_y = y;
-			}
-		}
-	}
-	piece_del(piece);
-	if (opt_x == -1 && opt_y == -1)
-		return (-1);	
-	ft_putnbr(opt_y - piece->min_y);
-	write(1, " ", 1);
-	ft_putnbr(opt_x - piece->min_x);
-	write(1, "\n", 1);
-	return (1);
-}
-
 void	list_del(t_coords *head)
 {
 	t_coords *next;
@@ -459,7 +357,7 @@ void	list_del(t_coords *head)
 	}
 }
 
-void	shit_happens(t_filler *s)
+void	del_everything(t_filler *s)
 {
 	while (--(s->height) >= 0)
 		free(s->array[s->height]);
@@ -472,52 +370,195 @@ void	shit_happens(t_filler *s)
 	exit(0);
 }
 
-int		main(void)
+short	enemy_closed(t_filler *s)
 {
-	t_piece			*piece;
-	static t_filler *s = NULL;
+	short x;
+	short y;
 
-	if (!s)
+	y = -1;
+	while (++y < s->height)
 	{
-		if (!(s = (t_filler*)malloc(sizeof(t_filler))))
-			return (-1);
-		s->width = 0;
-		s->height = 0;
-		s->enemy = NULL;
-		s->me = NULL;
-		s->player = get_player();
-		get_width_n_height(&s->width, &s->height);
-		if (!(s->array = create_array(s->width, s->height)))
+		x = -1;
+		while (++x < s->width)
+		{
+			if (s->array[y][x] == 1)
+				return (0);
+		}
+	}
+	return (1);
+}
+
+void	piece_del(t_piece *piece)
+{
+	short y;
+
+	free(piece->x);
+	free(piece->y);
+	y = -1;
+	while (++y < piece->shape_height)
+		free(piece->arr[y]);
+	free(piece->arr);
+	free(piece);
+}
+
+short	value_of_piece(t_piece *piece)
+{
+	short counter;
+	short res;
+	short x;
+	short y;
+
+	y = -1;
+	res = 0;
+	counter = 0;
+	while (++y < piece->shape_height)
+	{
+		x = -1;
+		while (++x < piece->shape_width)
+		{
+			if (piece->arr[y][x] == -2)
+				return (-1);
+			else if (piece->arr[y][x] == -1)
+				counter++;
+			else
+				res += piece->arr[y][x];
+		}
+	}
+	if (counter != 1)
+		return (-1);
+	return (res);
+}
+
+short	put_piece_on_map(t_filler *s, t_piece *piece, short x, short y)
+{
+	short tmp_x;
+	short tmp_y;
+
+	tmp_y = -1;
+	while (++tmp_y < piece->shape_height)
+	{
+		tmp_x = -1;
+		while (++tmp_x < piece->shape_width)
+		{
+			if ((y + tmp_y) < s->height && (x + tmp_x) < s->width)
+			{
+				if (piece->arr[tmp_y][tmp_x] == -3)
+					piece->arr[tmp_y][tmp_x] = s->array[y + tmp_y][x + tmp_x];
+			}
+			else
+				return (-1);
+		}
+	}
+	return (value_of_piece(piece));
+}
+
+short	easy_algorithm(t_filler *s, t_piece *piece, short x, short y)
+{
+	while (++y < s->height)
+	{
+		x = -1;
+		while (++x < s->width)
+		{
+			init_piece_arr(piece);
+			if (put_piece_on_map(s, piece, x, y) == 0)
+			{
+				ft_win(x - piece->min_x, y - piece->min_y);
+				piece_del(piece);
+				return (1);
+			}
+		}
+	}
+	piece_del(piece);
+	return (-1);
+}
+
+short	minihelp(t_filler *s, t_piece *piece, short opt_x, short opt_y)
+{
+	if (opt_x == -1 && opt_y == -1)
+	{
+		if (easy_algorithm(s, piece, -1, -1) == 1)
+			return (1);
+		else
 			return (-1);
 	}
+	else
+	{
+		ft_win(opt_x - piece->min_x, opt_y - piece->min_y);
+		piece_del(piece);
+		return (1);
+	}
+}
+
+short	hard_algorithm(t_filler *s, t_piece *piece, short x, short y)
+{
+	short tmp_mvop;
+	short mvop;
+	short opt_x;
+	short opt_y;
+
+	opt_x = -1;
+	opt_y = -1;
+	mvop = 32767;
+	while (++y < s->height)
+	{
+		x = -1;
+		while (++x < s->width)
+		{
+			init_piece_arr(piece);
+			tmp_mvop = put_piece_on_map(s, piece, x, y);
+			dprintf(3, "tmp_mvop = %d\n", tmp_mvop);
+			if (tmp_mvop < mvop && tmp_mvop > 0)
+			{
+				mvop = tmp_mvop;
+				opt_x = x;
+				opt_y = y;
+			}
+		}
+	}
+	return (minihelp(s, piece, opt_x, opt_y));
+}
+
+void	main_func(t_filler *s, char *line)
+{
+	t_piece *piece;
+
+	if (s->flag_for_arr == 0)
+	{
+		s->flag_for_arr = 1;
+		get_width_n_height(&s->width, &s->height, line);
+		s->array = create_array(s->width, s->height);
+	}
+	free(line);
 	get_players_coords(s);
 	bzero_board(&s->array, s->width, s->height);
-	put_players_on_board(s, s->array);
 	fill_array(s);
 	piece = create_piece();
-	if ((algorithm(s, piece, -1, -1)) == -1)
-		shit_happens(s);
+	piece->arr = create_array(piece->shape_width, piece->shape_height);
+	if (enemy_closed(s) == 1)
+	{
+		if (easy_algorithm(s, piece, -1, -1) == -1)
+			del_everything(s); // ВОЗМОЖНО ЕЩЕ И LINE
+	}
+	else if (hard_algorithm(s, piece, -1, -1) == -1)
+		del_everything(s); // ВОЗМОЖНО ЕЩЕ И LINE
+}
 
-	// short y = -1;
-	// short x;
-	// while (++y < s->height)
-	// {
-	// 	x = -1;
-	// 	while (++x < s->width)
-	// 		ft_nbr(s->array[y][x]);
-	// 	ft_pc('\n');
-	// }
+int		main(void)
+{
+	char			*line;
+	int fd;
+	t_filler *s = NULL;
 
-	// // short k = -1;
-
-	// // while (++k < piece->k)
-	// // {
-	// // 	ft_str("x = ");
-	// // 	ft_nbr(piece->x[k]);
-	// // 	ft_pc('\n');
-	// // 	ft_str("y = ");
-	// // 	ft_nbr(piece->y[k]);
-	// // 	ft_pc('\n');
-	// // }
+	if (!(s = (t_filler*)malloc(sizeof(t_filler))))
+		return (-1);
+	s->width = 0;
+	s->height = 0;
+	s->enemy = NULL;
+	s->me = NULL;
+	s->flag_for_arr = 0;
+	s->player = get_player();
+	fd = open("ali<3", O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	while (get_next_line(0, &line) > 0)
+		main_func(s, line);
 	return (0);
 }
