@@ -341,11 +341,7 @@ void	init_piece_arr(t_piece *piece)
 	bzero_board(&piece->arr, piece->shape_width, piece->shape_height);
 	k = -1;
 	while (++k < piece->k)
-	{
-		dprintf(3, "piece->y[%d]: %d\n", k, piece->y[k]);
-		dprintf(3, "piece->x[%d]: %d\n", k, piece->x[k]);
 		piece->arr[piece->y[k]][piece->x[k]] = -3;
-	}
 }
 
 void	list_del(t_coords *head)

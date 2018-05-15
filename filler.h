@@ -32,9 +32,9 @@ typedef struct
 	short		**array;
 	short		width;
 	short		height;
-	t_coords	*enemy;
 	t_coords	*me;
-	short		flag;
+	t_coords	*enemy;
+	char		flag;
 }				t_filler;
 
 typedef struct
