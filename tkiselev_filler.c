@@ -85,16 +85,18 @@ short		**create_array(short width, short height)
 {
 	short	**array;
 	short	x;
+	short	y;
 
 	if (!(array = (short**)malloc(sizeof(short *) * height)))
 		return (NULL);
-	while (--height >= 0)
+	y = -1;
+	while (++y < height)
 	{
 		x = -1;
-		if (!(array[height] = (short*)malloc(sizeof(short) * width)))
+		if (!(array[y] = (short*)malloc(sizeof(short) * width)))
 			return (NULL);
 		while (++x < width)
-			array[height][x] = 0;
+			array[y][x] = 0;
 	}
 	return (array);
 }
@@ -125,9 +127,8 @@ void	add_coords_if(t_coords **head, short x, short y)
 		*head = tmp;
 }
 
-void	get_players_coords(t_filler *s)
+void	get_players_coords(t_filler *s, char *line)
 {
-	char	*line;
 	short	h;
 	short	w;
 
@@ -269,7 +270,7 @@ void	fill_piece_arrays(t_piece *piece, char *line)
 	while (++y < piece->height && get_next_line(0, &line) > 0)
 	{		
 		x = -1;
-		while (line[++x])
+		while (++x < piece->width)
 		{
 			if (line[x] == '*')
 			{
@@ -300,26 +301,25 @@ void	nullify_piece_arrays(t_piece *piece)
 
 short		max_arr(short *array, short len)
 {
+	short i;
 	short max;
 
-	len--;
-	max = array[len];
-	while (--len >= 0)
+	max = array[0];
+	i = 0;
+	while (++i < len)
 	{
-		if (max < array[len])
-			max = array[len];
+		if (max < array[i])
+			max = array[i];
 	}
 	return (max);
 }
 
-t_piece		*create_piece(void)
+t_piece		*create_piece(char *line)
 {
-	char	*line;
 	t_piece	*piece;
 
 	if (!(piece = (t_piece*)malloc(sizeof(t_piece))))
 		return (NULL);
-	line = NULL;
 	get_piece_width_n_height(piece, line);
 	if (!(piece->y = (short*)malloc(sizeof(short) * piece->height))
 	|| !(piece->x = (short*)malloc(sizeof(short) * piece->width)))
@@ -330,6 +330,7 @@ t_piece		*create_piece(void)
 	nullify_piece_arrays(piece);
 	piece->shape_height = max_arr(piece->y, piece->k) + 1;
 	piece->shape_width = max_arr(piece->x, piece->k) + 1;
+	piece->arr = create_array(piece->shape_width, piece->shape_height);
 	return (piece);
 }
 
@@ -340,7 +341,11 @@ void	init_piece_arr(t_piece *piece)
 	bzero_board(&piece->arr, piece->shape_width, piece->shape_height);
 	k = -1;
 	while (++k < piece->k)
+	{
+		dprintf(3, "piece->y[%d]: %d\n", k, piece->y[k]);
+		dprintf(3, "piece->x[%d]: %d\n", k, piece->x[k]);
 		piece->arr[piece->y[k]][piece->x[k]] = -3;
+	}
 }
 
 void	list_del(t_coords *head)
@@ -359,10 +364,12 @@ void	list_del(t_coords *head)
 
 void	del_everything(t_filler *s)
 {
-	while (--(s->height) >= 0)
-		free(s->array[s->height]);
+	short y;
+
+	y = -1;
+	while (++y < s->height)
+		free(s->array[y]);
 	free(s->array);
-	s->array = NULL;
 	list_del(s->me);
 	list_del(s->enemy);
 	free(s);
@@ -454,6 +461,7 @@ short	put_piece_on_map(t_filler *s, t_piece *piece, short x, short y)
 
 short	easy_algorithm(t_filler *s, t_piece *piece, short x, short y)
 {
+
 	while (++y < s->height)
 	{
 		x = -1;
@@ -506,7 +514,6 @@ short	hard_algorithm(t_filler *s, t_piece *piece, short x, short y)
 		{
 			init_piece_arr(piece);
 			tmp_mvop = put_piece_on_map(s, piece, x, y);
-			dprintf(3, "tmp_mvop = %d\n", tmp_mvop);
 			if (tmp_mvop < mvop && tmp_mvop > 0)
 			{
 				mvop = tmp_mvop;
@@ -522,31 +529,32 @@ void	main_func(t_filler *s, char *line)
 {
 	t_piece *piece;
 
-	if (s->flag_for_arr == 0)
+	if (s->flag == 0)
 	{
-		s->flag_for_arr = 1;
+		s->flag = 1;
 		get_width_n_height(&s->width, &s->height, line);
 		s->array = create_array(s->width, s->height);
 	}
 	free(line);
-	get_players_coords(s);
+	get_players_coords(s, line);
 	bzero_board(&s->array, s->width, s->height);
 	fill_array(s);
-	piece = create_piece();
-	piece->arr = create_array(piece->shape_width, piece->shape_height);
+	piece = create_piece(line);
 	if (enemy_closed(s) == 1)
 	{
 		if (easy_algorithm(s, piece, -1, -1) == -1)
-			del_everything(s); // ВОЗМОЖНО ЕЩЕ И LINE
+			del_everything(s);
 	}
 	else if (hard_algorithm(s, piece, -1, -1) == -1)
-		del_everything(s); // ВОЗМОЖНО ЕЩЕ И LINE
+		del_everything(s);
 }
 
 int		main(void)
 {
 	char			*line;
+
 	int fd;
+
 	t_filler *s = NULL;
 
 	if (!(s = (t_filler*)malloc(sizeof(t_filler))))
@@ -555,9 +563,11 @@ int		main(void)
 	s->height = 0;
 	s->enemy = NULL;
 	s->me = NULL;
-	s->flag_for_arr = 0;
+	s->flag = 0;
 	s->player = get_player();
+
 	fd = open("ali<3", O_CREAT | O_WRONLY | O_TRUNC, 0644);
+
 	while (get_next_line(0, &line) > 0)
 		main_func(s, line);
 	return (0);
