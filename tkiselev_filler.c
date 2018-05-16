@@ -6,7 +6,7 @@
 /*   By: tkiselev <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/06 10:29:18 by tkiselev          #+#    #+#             */
-/*   Updated: 2018/05/08 19:48:22 by tkiselev         ###   ########.fr       */
+/*   Updated: 2018/05/16 19:10:13 by tkiselev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,10 @@ void	ft_str(char *str)
 		i++;
 	}
 }
+
+
+
+
 
 void	ft_win(short x, short y)
 {
@@ -321,8 +325,8 @@ t_piece		*create_piece(char *line)
 	if (!(piece = (t_piece*)malloc(sizeof(t_piece))))
 		return (NULL);
 	get_piece_width_n_height(piece, line);
-	if (!(piece->y = (short*)malloc(sizeof(short) * piece->height))
-	|| !(piece->x = (short*)malloc(sizeof(short) * piece->width)))
+	if (!(piece->y = (short*)malloc(sizeof(short) * (piece->height * piece->width)))
+	|| !(piece->x = (short*)malloc(sizeof(short) * (piece->height * piece->width))))
 		return (NULL);
 	piece->min_y = 32767;
 	piece->min_x = 32767;
@@ -457,7 +461,6 @@ short	put_piece_on_map(t_filler *s, t_piece *piece, short x, short y)
 
 short	easy_algorithm(t_filler *s, t_piece *piece, short x, short y)
 {
-
 	while (++y < s->height)
 	{
 		x = -1;
@@ -548,9 +551,6 @@ void	main_func(t_filler *s, char *line)
 int		main(void)
 {
 	char			*line;
-
-	int fd;
-
 	t_filler *s = NULL;
 
 	if (!(s = (t_filler*)malloc(sizeof(t_filler))))
@@ -561,9 +561,6 @@ int		main(void)
 	s->me = NULL;
 	s->flag = 0;
 	s->player = get_player();
-
-	fd = open("ali<3", O_CREAT | O_WRONLY | O_TRUNC, 0644);
-
 	while (get_next_line(0, &line) > 0)
 		main_func(s, line);
 	return (0);
