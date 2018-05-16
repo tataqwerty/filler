@@ -29,14 +29,13 @@ typedef struct
 	short		**array;
 	short		width;
 	short		height;
-	t_coords	*me;
 	t_coords	*enemy;
-	char		flag;
+	t_coords	*me;
+	short		flag_for_arr;
 }				t_filler;
 
 typedef struct
 {
-	short **arr;
 	short k;
 	short width;
 	short height;
@@ -46,6 +45,7 @@ typedef struct
 	short min_y;
 	short *x;
 	short *y;
+	short **arr;
 }				t_piece;
 
 char	get_player(void);
