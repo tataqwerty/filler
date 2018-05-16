@@ -12,6 +12,7 @@
 
 #include "filler.h"
 
+<<<<<<< HEAD
 void	ft_pc(char c)
 {
 	write(2, &c, 1);
@@ -459,6 +460,8 @@ short	put_piece_on_map(t_filler *s, t_piece *piece, short x, short y)
 	return (value_of_piece(piece));
 }
 
+=======
+>>>>>>> new
 short	easy_algorithm(t_filler *s, t_piece *piece, short x, short y)
 {
 	while (++y < s->height)
@@ -524,7 +527,7 @@ short	hard_algorithm(t_filler *s, t_piece *piece, short x, short y)
 	return (minihelp(s, piece, opt_x, opt_y));
 }
 
-void	main_func(t_filler *s, char *line)
+void	func(t_filler *s, char *line)
 {
 	t_piece *piece;
 
@@ -538,7 +541,11 @@ void	main_func(t_filler *s, char *line)
 	get_players_coords(s, line);
 	bzero_board(&s->array, s->width, s->height);
 	fill_array(s);
+<<<<<<< HEAD
 	piece = create_piece(line);
+=======
+	piece = create_piece();
+>>>>>>> new
 	if (enemy_closed(s) == 1)
 	{
 		if (easy_algorithm(s, piece, -1, -1) == -1)
@@ -562,6 +569,6 @@ int		main(void)
 	s->flag = 0;
 	s->player = get_player();
 	while (get_next_line(0, &line) > 0)
-		main_func(s, line);
+		func(s, line);
 	return (0);
 }
