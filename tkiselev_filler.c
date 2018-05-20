@@ -12,7 +12,7 @@
 
 #include "filler.h"
 
-short	easy_algorithm(t_filler *s, t_piece *piece, short x, short y)
+short			easy_algorithm(t_filler *s, t_piece *piece, short x, short y)
 {
 	while (++y < s->height)
 	{
@@ -32,7 +32,7 @@ short	easy_algorithm(t_filler *s, t_piece *piece, short x, short y)
 	return (-1);
 }
 
-short	minihelp(t_filler *s, t_piece *piece, short opt_x, short opt_y)
+short			minihelp(t_filler *s, t_piece *piece, short opt_x, short opt_y)
 {
 	if (opt_x == -1 && opt_y == -1)
 	{
@@ -49,12 +49,12 @@ short	minihelp(t_filler *s, t_piece *piece, short opt_x, short opt_y)
 	}
 }
 
-short	hard_algorithm(t_filler *s, t_piece *piece, short x, short y)
+short			hard_algorithm(t_filler *s, t_piece *piece, short x, short y)
 {
-	short tmp_mvop;
-	short mvop;
-	short opt_x;
-	short opt_y;
+	short		tmp_mvop;
+	short		mvop;
+	short		opt_x;
+	short		opt_y;
 
 	opt_x = -1;
 	opt_y = -1;
@@ -77,9 +77,9 @@ short	hard_algorithm(t_filler *s, t_piece *piece, short x, short y)
 	return (minihelp(s, piece, opt_x, opt_y));
 }
 
-void	func(t_filler *s, char *line)
+void			func(t_filler *s, char *line)
 {
-	t_piece *piece;
+	t_piece		*piece;
 
 	if (s->flag_for_arr == 0)
 	{
@@ -101,10 +101,10 @@ void	func(t_filler *s, char *line)
 		del_everything(s);
 }
 
-int		main(void)
+int				main(void)
 {
-	char			*line;
-	t_filler *s = NULL;
+	char		*line;
+	t_filler	*s;
 
 	if (!(s = (t_filler*)malloc(sizeof(t_filler))))
 		return (-1);

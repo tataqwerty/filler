@@ -12,9 +12,9 @@
 
 #include "filler.h"
 
-void	get_piece_width_n_height(t_piece *piece, char *line)
+void		get_piece_width_n_height(t_piece *piece, char *line)
 {
-	short i;
+	short	i;
 
 	i = 0;
 	get_next_line(0, &line);
@@ -37,15 +37,15 @@ void	get_piece_width_n_height(t_piece *piece, char *line)
 	line = NULL;
 }
 
-void	fill_piece_arrays(t_piece *piece, char *line)
+void		fill_piece_arrays(t_piece *piece, char *line)
 {
-	short x;
-	short y;
+	short	x;
+	short	y;
 
 	y = -1;
 	piece->k = 0;
 	while (++y < piece->height && get_next_line(0, &line) > 0)
-	{		
+	{
 		x = -1;
 		while (line[++x])
 		{
@@ -64,9 +64,9 @@ void	fill_piece_arrays(t_piece *piece, char *line)
 	}
 }
 
-void	nullify_piece_arrays(t_piece *piece)
+void		nullify_piece_arrays(t_piece *piece)
 {
-	short k;
+	short	k;
 
 	k = -1;
 	while (++k < piece->k)
@@ -100,8 +100,10 @@ t_piece		*create_piece(void)
 		return (NULL);
 	line = NULL;
 	get_piece_width_n_height(piece, line);
-	if (!(piece->y = (short*)malloc(sizeof(short) * piece->height * piece->width))
-	|| !(piece->x = (short*)malloc(sizeof(short) * piece->width * piece->height)))
+	if (!(piece->y = (short*)malloc(sizeof(short) *
+		piece->height * piece->width))
+	|| !(piece->x = (short*)malloc(sizeof(short) *
+		piece->width * piece->height)))
 		return (NULL);
 	piece->min_y = 32767;
 	piece->min_x = 32767;

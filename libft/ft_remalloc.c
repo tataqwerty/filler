@@ -14,9 +14,9 @@
 
 char		*ft_remalloc(char *ptr, int size)
 {
-	int				i;
+	int		i;
 	char	*new_ptr;
-	
+
 	i = 0;
 	if (!(new_ptr = (char *)malloc(sizeof(char)
 	* (size + 1))))
@@ -25,7 +25,7 @@ char		*ft_remalloc(char *ptr, int size)
 	if (ptr)
 	{
 		while (ptr[i] != '\0')
-        {
+		{
 			new_ptr[i] = ptr[i];
 			i++;
 		}

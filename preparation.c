@@ -12,10 +12,10 @@
 
 #include "filler.h"
 
-char		get_player(void)
+char			get_player(void)
 {
-	char *line;
-	char p;
+	char		*line;
+	char		p;
 
 	get_next_line(0, &line);
 	if (ft_strstr(line, "p1"))
@@ -26,9 +26,9 @@ char		get_player(void)
 	return (p);
 }
 
-void	get_width_n_height(short *width, short *height, char *line)
+void			get_width_n_height(short *width, short *height, char *line)
 {
-	short	i;
+	short		i;
 
 	i = 0;
 	while (line[i] < '0' || line[i] > '9')
@@ -39,10 +39,10 @@ void	get_width_n_height(short *width, short *height, char *line)
 	*width = ft_atoi(line + i);
 }
 
-short		**create_array(short width, short height)
+short			**create_array(short width, short height)
 {
-	short	**array;
-	short	x;
+	short		**array;
+	short		x;
 
 	if (!(array = (short**)malloc(sizeof(short *) * height)))
 		return (NULL);
@@ -57,10 +57,10 @@ short		**create_array(short width, short height)
 	return (array);
 }
 
-void	add_coords_if(t_coords **head, short x, short y)
+void			add_coords_if(t_coords **head, short x, short y)
 {
-	t_coords *helper;
-	t_coords *tmp;
+	t_coords	*helper;
+	t_coords	*tmp;
 
 	helper = *head;
 	while (helper)
@@ -83,11 +83,11 @@ void	add_coords_if(t_coords **head, short x, short y)
 		*head = tmp;
 }
 
-void	get_players_coords(t_filler *s)
+void			get_players_coords(t_filler *s)
 {
-	char	*line;
-	short	h;
-	short	w;
+	char		*line;
+	short		h;
+	short		w;
 
 	h = -1;
 	get_next_line(0, &line);

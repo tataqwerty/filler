@@ -12,12 +12,12 @@
 
 #include "libft.h"
 
-char	*ft_itoa(int n)
+char		*ft_itoa(int n)
 {
 	char	*arr;
 	int		i;
 	int		nb;
-	
+
 	nb = (n < 0) ? n * -1 : n;
 	i = (n < 0) ? 2 : 1;
 	while ((nb /= 10))
