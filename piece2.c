@@ -18,8 +18,6 @@ void	del_everything(t_filler *s)
 		free(s->array[s->height]);
 	free(s->array);
 	s->array = NULL;
-	list_del(s->me);
-	list_del(s->enemy);
 	free(s);
 	write(1, "0 0\n", 4);
 	exit(0);

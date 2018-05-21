@@ -33,8 +33,6 @@ void				ft_main_algo(short *p1, short *p2, char *line)
 		}
 		ft_magic(array, line, height);
 	}
-	if (array)
-		free(array);
 	usleep(1500000);
 	init_results(line, p1, p2);
 }

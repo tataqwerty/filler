@@ -37,17 +37,3 @@ short	enemy_closed(t_filler *s)
 	}
 	return (1);
 }
-
-void	list_del(t_coords *head)
-{
-	t_coords *next;
-
-	if (!head)
-		return ;
-	while (head)
-	{
-		next = head->next;
-		free(head);
-		head = next;
-	}
-}

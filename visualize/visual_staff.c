@@ -32,24 +32,12 @@ void	output_map(char **array, unsigned char height)
 	}
 }
 
-void	delete_map(char **array, unsigned char height)
-{
-	unsigned char i;
-
-	i = 0;
-	while (i < height)
-		free(array[i++]);
-}
-
 void	ft_magic(char **array, char *line, unsigned char height)
 {
-	free(line);
 	get_next_line(0, &line);
-	free(line);
 	create_map(array, height);
 	output_map(array, height);
 	refresh();
-	delete_map(array, height);
 	get_next_line(0, &line);
 	skip_shit_after_map(line);
 }
@@ -57,10 +45,8 @@ void	ft_magic(char **array, char *line, unsigned char height)
 void	init_results(char *line, short *p1, short *p2)
 {
 	*p1 = ft_atoi(line + 10);
-	free(line);
 	get_next_line(0, &line);
 	*p2 = ft_atoi(line + 10);
-	free(line);
 }
 
 char	error_mamagement(char *line)

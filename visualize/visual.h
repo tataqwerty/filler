@@ -24,6 +24,5 @@ char	error_mamagement(char *line);
 void	output_char(unsigned char y, unsigned char x, char c);
 void	output_map(char **array, unsigned char height);
 void	create_map(char **array, unsigned char height);
-void	delete_map(char **array, unsigned char height);
 void	skip_shit_after_map(char *line);
 #endif

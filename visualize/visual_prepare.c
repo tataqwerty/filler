@@ -18,7 +18,7 @@ void	skip_shit_before_map(char *line)
 
 	i = 9;
 	while (--i >= 0 && get_next_line(0, &line) > 0)
-		free(line);
+		;
 }
 
 void	skip_shit_after_map(char *line)
@@ -26,11 +26,9 @@ void	skip_shit_after_map(char *line)
 	unsigned char height;
 
 	height = ft_atoi(line + 6);
-	free(line);
 	while (height-- > 0 && get_next_line(0, &line) > 0)
-		free(line);
+		;
 	get_next_line(0, &line);
-	free(line);
 }
 
 void	preparation(char ***array, char *line, unsigned char *height)

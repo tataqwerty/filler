@@ -88,8 +88,8 @@ void			func(t_filler *s, char *line)
 		s->array = create_array(s->width, s->height);
 	}
 	free(line);
-	get_players_coords(s);
 	bzero_board(&s->array, s->width, s->height);
+	get_players_coords(s);
 	fill_array(s);
 	piece = create_piece();
 	if (enemy_closed(s) == 1)
@@ -110,8 +110,6 @@ int				main(void)
 		return (-1);
 	s->width = 0;
 	s->height = 0;
-	s->enemy = NULL;
-	s->me = NULL;
 	s->flag_for_arr = 0;
 	s->player = get_player();
 	while (get_next_line(0, &line) > 0)

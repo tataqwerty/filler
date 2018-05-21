@@ -12,25 +12,6 @@
 
 #include "filler.h"
 
-void	put_players_on_board(t_filler *s, short **array)
-{
-	t_coords	*me;
-	t_coords	*enemy;
-
-	me = s->me;
-	enemy = s->enemy;
-	while (me)
-	{
-		array[me->y][me->x] = -1;
-		me = me->next;
-	}
-	while (enemy)
-	{
-		array[enemy->y][enemy->x] = -2;
-		enemy = enemy->next;
-	}
-}
-
 void	bzero_board(short ***array, short width, short height)
 {
 	short y;
@@ -59,13 +40,18 @@ void	envelop_xy(t_filler *s, short x, short y, short d)
 
 void	add_ones(t_filler *s)
 {
-	t_coords *enemy;
+	short x;
+	short y;
 
-	enemy = s->enemy;
-	while (enemy)
+	y = -1;
+	while (++y < s->height)
 	{
-		envelop_xy(s, enemy->x, enemy->y, 1);
-		enemy = enemy->next;
+		x = -1;
+		while (++x < s->width)
+		{
+			if (s->array[y][x] == -2)
+				envelop_xy(s, x, y, 1);
+		}
 	}
 }
 
@@ -76,7 +62,6 @@ void	fill_array(t_filler *s)
 	short x;
 	short d;
 
-	put_players_on_board(s, s->array);
 	add_ones(s);
 	d = 1;
 	y = -1;

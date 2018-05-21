@@ -57,32 +57,6 @@ short			**create_array(short width, short height)
 	return (array);
 }
 
-void			add_coords_if(t_coords **head, short x, short y)
-{
-	t_coords	*helper;
-	t_coords	*tmp;
-
-	helper = *head;
-	while (helper)
-	{
-		if (helper->x == x && helper->y == y)
-			return ;
-		else if (helper->next)
-			helper = helper->next;
-		else
-			break ;
-	}
-	if (!(tmp = (t_coords*)malloc(sizeof(t_coords))))
-		return ;
-	tmp->x = x;
-	tmp->y = y;
-	tmp->next = NULL;
-	if (helper)
-		helper->next = tmp;
-	else
-		*head = tmp;
-}
-
 void			get_players_coords(t_filler *s)
 {
 	char		*line;
@@ -98,9 +72,9 @@ void			get_players_coords(t_filler *s)
 		while (line[++w])
 		{
 			if (s->player == line[w] || s->player == (line[w] - 32))
-				add_coords_if(&s->me, w - 4, h);
+				s->array[h][w - 4] = -1;
 			else if (line[w] != '.')
-				add_coords_if(&s->enemy, w - 4, h);
+				s->array[h][w - 4] = -2;
 		}
 		free(line);
 	}
